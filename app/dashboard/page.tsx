@@ -1,6 +1,9 @@
+"use client";
+
+import Link from "next/link";
 import { CheckCircle2, Music, Settings, Plus, LayoutGrid } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
-import { TaskList } from "@/components/TaskList"; // <--- Importing the real list
+import { TaskList } from "@/components/TaskList";
 
 export default function Dashboard() {
   return (
@@ -14,9 +17,18 @@ export default function Dashboard() {
         </div>
         
         <nav className="flex-1 space-y-6 w-full px-4">
-            <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" active />
+            {/* Link 1: Dashboard (Current) */}
+            <Link href="/dashboard">
+                <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" active />
+            </Link>
+            
             <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Tasks" />
-            <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" />
+            
+            {/* Link 2: Soundscapes (New!) */}
+            <Link href="/soundscapes">
+                <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" />
+            </Link>
+            
             <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
         </nav>
       </aside>
@@ -71,4 +83,3 @@ function NavItem({ icon, label, active = false }: { icon: any, label: string, ac
         </div>
     )
 }
-
