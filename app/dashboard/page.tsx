@@ -25,7 +25,10 @@ const QUOTES = [
 export default function Dashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"dashboard" | "soundscapes">("dashboard");
-  const [userName, setUserName] = useState("Traveler");
+  
+  // FIX: Start as null so we don't show "Traveler" by mistake
+  const [userName, setUserName] = useState<string | null>(null);
+  
   const [quote, setQuote] = useState(QUOTES[0]);
 
   useEffect(() => {
@@ -51,15 +54,10 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans selection:bg-purple-500/30 relative">
       
-      {/* --- NEW HIGH-PERFORMANCE BACKGROUND --- */}
+      {/* GRID BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        {/* 1. Base Layer: Deep Zinc */}
         <div className="absolute inset-0 bg-zinc-950" />
-        
-        {/* 2. The Technical Grid: A repeating pattern drawn by CSS (Zero Load) */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-        
-        {/* 3. The Vignette: Fades the edges to black to focus the eyes */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_200px,#3b07641a,transparent)]" />
       </div>
@@ -116,17 +114,25 @@ export default function Dashboard() {
                             {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
                         </span>
                     </div>
+                    
+                    {/* SKELETON LOADER LOGIC */}
                     <h1 className="text-5xl lg:text-6xl font-thin tracking-tighter text-white/90">
-                        Good Evening, <span className="font-normal text-white">{userName}</span>.
+                        Good Evening, {" "}
+                        {userName ? (
+                             // The Name (Fades in when ready)
+                             <span className="font-normal text-white animate-in fade-in duration-500">{userName}</span>
+                        ) : (
+                             // The Skeleton (Pulsing bar while loading)
+                             <span className="inline-block w-64 h-12 bg-white/10 rounded-xl animate-pulse align-bottom ml-2" />
+                        )}
+                        .
                     </h1>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    
-                    {/* 1. TIMER */}
                     <FocusTimer /> 
 
-                    {/* 2. DAILY INSIGHT */}
+                    {/* DAILY INSIGHT */}
                     <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-8 hover:border-white/10 transition duration-500 flex flex-col justify-between group shadow-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition duration-500">
                              <Quote className="w-24 h-24 text-white" />
@@ -146,7 +152,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                     
-                    {/* 3. MISSION LOG */}
+                    {/* MISSION LOG */}
                     <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-8 hover:border-white/10 transition duration-500 group flex flex-col shadow-xl">
                         <div className="flex justify-between items-center mb-8">
                             <div className="flex items-center gap-3">
@@ -173,5 +179,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 
