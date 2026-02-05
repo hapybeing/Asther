@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Music, Settings, LayoutGrid, CloudRain, Flame, Wind, Coffee, Volume2, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// 1. The Reliable Sound Library (Powered by Google)
+// 1. The Reliable Sound Library (Wind Updated to MP3)
 const SOUNDS = [
   {
     id: "rain",
@@ -29,7 +29,8 @@ const SOUNDS = [
     icon: Wind,
     color: "text-slate-400",
     bg: "bg-slate-500/10",
-    url: "https://actions.google.com/sounds/v1/weather/wind_medium.ogg"
+    // Switched to a standard MP3 for better tablet compatibility
+    url: "https://cdn.pixabay.com/audio/2022/10/30/audio_51d2e1c3a6.mp3" 
   },
   {
     id: "cafe",
@@ -56,21 +57,20 @@ export default function Soundscapes() {
       
       const audio = new Audio(sound.url);
       audio.loop = true;
-      audio.volume = 1.0; // Max volume
+      audio.volume = 1.0; 
       
-      // Attempt to play with error handling for tablets
       const playPromise = audio.play();
       
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            // Audio started!
             audioRef.current = audio;
             setActiveSound(sound.id);
           })
           .catch((error) => {
             console.error("Playback failed:", error);
-            alert("Tap again! Browser blocked auto-play.");
+            // More specific error message
+            alert("Audio loading... Tap again in a second!");
           });
       }
     }
