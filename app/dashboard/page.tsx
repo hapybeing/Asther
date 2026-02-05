@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutGrid, Music, Settings, Plus, LogOut } from "lucide-react";
+import { LayoutGrid, Music, Plus, LogOut } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
 import { Soundscapes } from "@/components/Soundscapes"; 
 
 export default function Dashboard() {
-  // STATE: This controls the view. Default is 'dashboard'.
   const [activeTab, setActiveTab] = useState<"dashboard" | "soundscapes">("dashboard");
   const userName = "Gaurang"; 
 
@@ -41,7 +40,7 @@ export default function Dashboard() {
             </button>
         </nav>
 
-        {/* Fake Sign Out */}
+        {/* Sign Out Placeholder */}
         <div className="px-4 w-full">
              <div className="flex items-center gap-4 px-4 py-3 text-zinc-600 hover:text-white transition cursor-not-allowed opacity-50">
                 <LogOut className="w-5 h-5" />
@@ -56,7 +55,7 @@ export default function Dashboard() {
 
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
             
-            {/* VIEW 1: DASHBOARD (Hidden when inactive, but ALIVE) */}
+            {/* VIEW 1: DASHBOARD */}
             <div className={activeTab === "dashboard" ? "block space-y-10 animate-in fade-in" : "hidden"}>
                 
                 <header className="flex justify-between items-end">
@@ -83,7 +82,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* VIEW 2: SOUNDSCAPES (Hidden when inactive) */}
+            {/* VIEW 2: SOUNDSCAPES */}
             <div className={activeTab === "soundscapes" ? "block" : "hidden"}>
                 <Soundscapes />
             </div>
