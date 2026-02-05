@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LayoutGrid, Music, Plus, LogOut } from "lucide-react";
+import { LayoutGrid, Music, LogOut } from "lucide-react"; // Removed 'Plus' icon
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
 import { Soundscapes } from "@/components/Soundscapes";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
-// Initialize client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -17,18 +16,19 @@ const supabase = createClient(
 export default function Dashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"dashboard" | "soundscapes">("dashboard");
-  const [userName, setUserName] = useState("Traveler"); // Default until loaded
+  const [userName, setUserName] = useState("Traveler");
 
   useEffect(() => {
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        // If not logged in, kick them out
         router.push("/login");
       } else {
-        // Use their email username (everything before the @)
-        const name = user.email?.split("@")[0] || "Traveler";
-        // Capitalize first letter
+        // 1. Get the part before @
+        let name = user.email?.split("@")[0] || "Traveler";
+        // 2. Remove numbers (The Polish Fix)
+        name = name.replace(/[0-9]/g, '');
+        // 3. Capitalize
         setUserName(name.charAt(0).toUpperCase() + name.slice(1));
       }
     }
@@ -68,7 +68,6 @@ export default function Dashboard() {
             </button>
         </nav>
 
-        {/* Real Sign Out Button */}
         <div className="px-4 w-full">
              <button 
                 onClick={handleSignOut}
@@ -89,15 +88,10 @@ export default function Dashboard() {
             {/* VIEW 1: DASHBOARD */}
             <div className={activeTab === "dashboard" ? "block space-y-10 animate-in fade-in" : "hidden"}>
                 
-                <header className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-4xl font-light text-white/90">Good Evening, {userName}.</h1>
-                        <p className="text-zinc-500 mt-2">Ready to enter flow state?</p>
-                    </div>
-                    <button className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-zinc-200 transition shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                        <Plus className="w-4 h-4" /> 
-                        <span className="hidden sm:inline">New Session</span>
-                    </button>
+                {/* CLEAN HEADER (No Button, Better Name) */}
+                <header>
+                    <h1 className="text-4xl font-light text-white/90">Good Evening, {userName}.</h1>
+                    <p className="text-zinc-500 mt-2">Ready to enter flow state?</p>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
