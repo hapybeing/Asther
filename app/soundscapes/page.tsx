@@ -2,10 +2,9 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { CheckCircle2, Music, Settings, LayoutGrid, CloudRain, Flame, Wind, Coffee, Volume2, Pause, Play } from "lucide-react";
+import { LayoutGrid, Music, CloudRain, Flame, Waves, Coffee, Volume2, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// 1. The Reliable Sound Library (Wind Updated to MP3)
 const SOUNDS = [
   {
     id: "rain",
@@ -24,13 +23,12 @@ const SOUNDS = [
     url: "https://actions.google.com/sounds/v1/ambiences/fire.ogg"
   },
   {
-    id: "wind",
-    label: "Night Wind",
-    icon: Wind,
-    color: "text-slate-400",
-    bg: "bg-slate-500/10",
-    // Switched to a standard MP3 for better tablet compatibility
-    url: "https://cdn.pixabay.com/audio/2022/10/30/audio_51d2e1c3a6.mp3" 
+    id: "river",
+    label: "Flowing River", // Replaced broken Wind with River
+    icon: Waves,
+    color: "text-cyan-400",
+    bg: "bg-cyan-500/10",
+    url: "https://actions.google.com/sounds/v1/nature/river_small_running.ogg" 
   },
   {
     id: "cafe",
@@ -48,53 +46,37 @@ export default function Soundscapes() {
 
   const toggleSound = (sound: typeof SOUNDS[0]) => {
     if (activeSound === sound.id) {
-      // Pause
       audioRef.current?.pause();
       setActiveSound(null);
     } else {
-      // Play
       if (audioRef.current) audioRef.current.pause();
-      
       const audio = new Audio(sound.url);
       audio.loop = true;
-      audio.volume = 1.0; 
-      
-      const playPromise = audio.play();
-      
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            audioRef.current = audio;
-            setActiveSound(sound.id);
-          })
-          .catch((error) => {
-            console.error("Playback failed:", error);
-            // More specific error message
-            alert("Audio loading... Tap again in a second!");
-          });
-      }
+      audio.volume = 1.0;
+      audio.play().catch(e => alert("Tap again to play (Browser blocked auto-play)"));
+      audioRef.current = audio;
+      setActiveSound(sound.id);
     }
   };
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
-      {/* Sidebar */}
-      <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 transition-all z-50">
+      {/* CLEAN SIDEBAR (No dead links) */}
+      <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 z-50">
         <div className="mb-10 px-0 lg:px-8">
             <h2 className="text-2xl font-bold hidden lg:block tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500">Asther.</h2>
             <div className="h-8 w-8 bg-white rounded-full lg:hidden" />
         </div>
         
-        <nav className="flex-1 space-y-6 w-full px-4">
+        <nav className="flex-1 space-y-4 w-full px-4">
             <Link href="/dashboard">
                 <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" />
             </Link>
-            <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Tasks" />
+            
             <Link href="/soundscapes">
                 <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" active />
             </Link>
-            <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
         </nav>
       </aside>
 
@@ -105,7 +87,7 @@ export default function Soundscapes() {
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
             <header>
                 <h1 className="text-4xl font-light text-white/90">Sonic Environment.</h1>
-                <p className="text-zinc-500 mt-2">Design your background noise.</p>
+                <p className="text-zinc-500 mt-2">Focus music for deep work.</p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
