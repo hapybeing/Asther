@@ -4,19 +4,17 @@ import { useState } from "react";
 import { LayoutGrid, Music, Settings, Plus, LogOut } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
-import { Soundscapes } from "@/components/Soundscapes"; // Import our new component
+import { Soundscapes } from "@/components/Soundscapes"; 
 
 export default function Dashboard() {
-  // 1. STATE: Which tab is active?
+  // STATE: This controls the view. Default is 'dashboard'.
   const [activeTab, setActiveTab] = useState<"dashboard" | "soundscapes">("dashboard");
-
-  // 2. DATA: Hardcoded name for now (We will fix this with Auth later)
   const userName = "Gaurang"; 
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
-      {/* SIDEBAR - Controls the View */}
+      {/* SIDEBAR */}
       <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 z-50">
         <div className="mb-10 px-0 lg:px-8">
             <h2 className="text-2xl font-bold hidden lg:block tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500">Asther.</h2>
@@ -24,16 +22,26 @@ export default function Dashboard() {
         </div>
         
         <nav className="flex-1 space-y-4 w-full px-4">
-            <button onClick={() => setActiveTab("dashboard")} className="w-full">
-                <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" active={activeTab === "dashboard"} />
+            {/* BUTTON 1: Dashboard */}
+            <button 
+                onClick={() => setActiveTab("dashboard")} 
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
+            >
+                <LayoutGrid className="w-5 h-5" />
+                <span className="hidden lg:block font-medium">Dashboard</span>
             </button>
             
-            <button onClick={() => setActiveTab("soundscapes")} className="w-full">
-                <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" active={activeTab === "soundscapes"} />
+            {/* BUTTON 2: Soundscapes */}
+            <button 
+                onClick={() => setActiveTab("soundscapes")} 
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'soundscapes' ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
+            >
+                <Music className="w-5 h-5" />
+                <span className="hidden lg:block font-medium">Soundscapes</span>
             </button>
         </nav>
 
-        {/* Future Auth Button */}
+        {/* Fake Sign Out */}
         <div className="px-4 w-full">
              <div className="flex items-center gap-4 px-4 py-3 text-zinc-600 hover:text-white transition cursor-not-allowed opacity-50">
                 <LogOut className="w-5 h-5" />
@@ -42,14 +50,13 @@ export default function Dashboard() {
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 overflow-auto relative">
         <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-900/20 to-transparent pointer-events-none" />
 
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
             
-            {/* --- VIEW 1: DASHBOARD --- */}
-            {/* We use 'hidden' class instead of removing it from DOM, so Timer keeps running! */}
+            {/* VIEW 1: DASHBOARD (Hidden when inactive, but ALIVE) */}
             <div className={activeTab === "dashboard" ? "block space-y-10 animate-in fade-in" : "hidden"}>
                 
                 <header className="flex justify-between items-end">
@@ -76,7 +83,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* --- VIEW 2: SOUNDSCAPES --- */}
+            {/* VIEW 2: SOUNDSCAPES (Hidden when inactive) */}
             <div className={activeTab === "soundscapes" ? "block" : "hidden"}>
                 <Soundscapes />
             </div>
@@ -85,15 +92,6 @@ export default function Dashboard() {
       </main>
     </div>
   );
-}
-
-function NavItem({ icon, label, active = false }: { icon: any, label: string, active?: boolean }) {
-    return (
-        <div className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${active ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}>
-            {icon}
-            <span className="hidden lg:block font-medium">{label}</span>
-        </div>
-    )
 }
 
 
