@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { LayoutGrid, Music, CloudRain, Flame, Waves, Coffee, Volume2, Pause, Play } from "lucide-react";
+import { LayoutGrid, Music, CloudRain, Flame, Trees, Coffee, Volume2, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const SOUNDS = [
@@ -23,12 +23,13 @@ const SOUNDS = [
     url: "https://actions.google.com/sounds/v1/ambiences/fire.ogg"
   },
   {
-    id: "river",
-    label: "Flowing River", // Replaced broken Wind with River
-    icon: Waves,
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-    url: "https://actions.google.com/sounds/v1/nature/river_small_running.ogg" 
+    id: "forest",
+    label: "Deep Forest", // <--- THE EXORCISM (Swapped River for Forest)
+    icon: Trees,          // <--- New Icon
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10",
+    // Using a lighter, faster file to prevent the "Block" error
+    url: "https://actions.google.com/sounds/v1/relax/forest.ogg" 
   },
   {
     id: "cafe",
@@ -50,10 +51,14 @@ export default function Soundscapes() {
       setActiveSound(null);
     } else {
       if (audioRef.current) audioRef.current.pause();
+      
       const audio = new Audio(sound.url);
       audio.loop = true;
       audio.volume = 1.0;
-      audio.play().catch(e => alert("Tap again to play (Browser blocked auto-play)"));
+      
+      // I removed the annoying alert. If it blocks, just tap it twice!
+      audio.play().catch(e => console.log("Buffering... tap again if needed."));
+      
       audioRef.current = audio;
       setActiveSound(sound.id);
     }
@@ -62,7 +67,7 @@ export default function Soundscapes() {
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
-      {/* CLEAN SIDEBAR (No dead links) */}
+      {/* SIDEBAR (Kept the fixed version) */}
       <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 z-50">
         <div className="mb-10 px-0 lg:px-8">
             <h2 className="text-2xl font-bold hidden lg:block tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500">Asther.</h2>
@@ -82,7 +87,7 @@ export default function Soundscapes() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto relative">
-        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-900/20 to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-emerald-900/20 to-transparent pointer-events-none" />
 
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
             <header>
