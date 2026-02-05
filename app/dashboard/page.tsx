@@ -1,4 +1,5 @@
-import { Play, CheckCircle2, Music, Settings, Plus } from "lucide-react";
+import { CheckCircle2, Music, Settings, Plus } from "lucide-react";
+import { FocusTimer } from "@/components/FocusTimer"; // <--- Importing your new brain cell
 
 export default function Dashboard() {
   return (
@@ -13,7 +14,7 @@ export default function Dashboard() {
         
         {/* Nav Icons */}
         <nav className="flex-1 space-y-6 w-full px-4">
-            <NavItem icon={<Play className="w-5 h-5" />} label="Focus Mode" active />
+            <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Focus Mode" active />
             <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Tasks" />
             <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" />
             <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
@@ -22,12 +23,10 @@ export default function Dashboard() {
 
       {/* 2. Main Content Area */}
       <main className="flex-1 overflow-auto relative">
-        {/* Background Ambient Light */}
         <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-900/20 to-transparent pointer-events-none" />
 
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
             
-            {/* Header */}
             <header className="flex justify-between items-end">
                 <div>
                     <h1 className="text-4xl font-light text-white/90">Good Evening, Gaurang.</h1>
@@ -39,23 +38,12 @@ export default function Dashboard() {
                 </button>
             </header>
 
-            {/* Widgets Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Card 1: Focus Timer */}
-                <div className="col-span-1 md:col-span-2 h-64 rounded-3xl bg-zinc-900/50 border border-white/5 p-8 flex flex-col justify-between hover:border-white/10 transition group cursor-pointer">
-                    <div className="flex justify-between items-start">
-                        <div className="p-3 bg-purple-500/10 rounded-full text-purple-400 group-hover:text-purple-300 transition">
-                            <Play className="w-6 h-6" />
-                        </div>
-                        <span className="text-zinc-500 text-sm">Deep Work</span>
-                    </div>
-                    <div>
-                        <div className="text-5xl font-mono font-bold tracking-tighter">25:00</div>
-                        <p className="text-zinc-500 mt-2">No active session.</p>
-                    </div>
-                </div>
+                
+                {/* COMPONENT 1: The New Functional Timer */}
+                <FocusTimer /> 
 
-                {/* Card 2: Quick Tasks */}
+                {/* COMPONENT 2: Quick Tasks (Still Static for now) */}
                 <div className="h-64 rounded-3xl bg-zinc-900/50 border border-white/5 p-8 hover:border-white/10 transition group">
                      <div className="flex justify-between items-start mb-6">
                         <div className="p-3 bg-blue-500/10 rounded-full text-blue-400">
@@ -86,7 +74,6 @@ export default function Dashboard() {
   );
 }
 
-// Helper Component for Sidebar Items
 function NavItem({ icon, label, active = false }: { icon: any, label: string, active?: boolean }) {
     return (
         <div className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${active ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}>
