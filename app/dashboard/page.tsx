@@ -1,20 +1,20 @@
-import { CheckCircle2, Music, Settings, Plus } from "lucide-react";
-import { FocusTimer } from "@/components/FocusTimer"; // <--- Importing your new brain cell
+import { CheckCircle2, Music, Settings, Plus, LayoutGrid } from "lucide-react";
+import { FocusTimer } from "@/components/FocusTimer";
+import { TaskList } from "@/components/TaskList"; // <--- Importing the real list
 
 export default function Dashboard() {
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
       {/* 1. The Zen Sidebar */}
-      <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 transition-all">
+      <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 transition-all z-50">
         <div className="mb-10 px-0 lg:px-8">
-            <h2 className="text-2xl font-bold hidden lg:block tracking-tighter">Asther.</h2>
+            <h2 className="text-2xl font-bold hidden lg:block tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500">Asther.</h2>
             <div className="h-8 w-8 bg-white rounded-full lg:hidden" />
         </div>
         
-        {/* Nav Icons */}
         <nav className="flex-1 space-y-6 w-full px-4">
-            <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Focus Mode" active />
+            <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" active />
             <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Tasks" />
             <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" />
             <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
@@ -32,7 +32,7 @@ export default function Dashboard() {
                     <h1 className="text-4xl font-light text-white/90">Good Evening, Gaurang.</h1>
                     <p className="text-zinc-500 mt-2">Ready to enter flow state?</p>
                 </div>
-                <button className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-zinc-200 transition">
+                <button className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-zinc-200 transition shadow-[0_0_15px_rgba(255,255,255,0.2)]">
                     <Plus className="w-4 h-4" /> 
                     <span className="hidden sm:inline">New Session</span>
                 </button>
@@ -40,31 +40,20 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                {/* COMPONENT 1: The New Functional Timer */}
+                {/* COMPONENT 1: Focus Timer */}
                 <FocusTimer /> 
 
-                {/* COMPONENT 2: Quick Tasks (Still Static for now) */}
-                <div className="h-64 rounded-3xl bg-zinc-900/50 border border-white/5 p-8 hover:border-white/10 transition group">
+                {/* COMPONENT 2: Real Database Tasks */}
+                <div className="h-64 rounded-3xl bg-zinc-900/50 border border-white/5 p-8 hover:border-white/10 transition group flex flex-col">
                      <div className="flex justify-between items-start mb-6">
                         <div className="p-3 bg-blue-500/10 rounded-full text-blue-400">
                             <CheckCircle2 className="w-6 h-6" />
                         </div>
-                        <span className="text-zinc-500 text-sm">3 Pending</span>
+                        <span className="text-zinc-500 text-sm">Mission Log</span>
                     </div>
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-3 text-sm text-zinc-300">
-                            <div className="w-4 h-4 rounded-full border border-zinc-600" />
-                            <span>Update portfolio site</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-sm text-zinc-300">
-                            <div className="w-4 h-4 rounded-full border border-zinc-600" />
-                            <span>Read documentation</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-sm text-zinc-300">
-                            <div className="w-4 h-4 rounded-full border border-zinc-600" />
-                            <span>Design system review</span>
-                        </div>
-                    </div>
+                    
+                    {/* The Real Data Connection */}
+                    <TaskList /> 
                 </div>
             </div>
 
@@ -76,9 +65,10 @@ export default function Dashboard() {
 
 function NavItem({ icon, label, active = false }: { icon: any, label: string, active?: boolean }) {
     return (
-        <div className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${active ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}>
+        <div className={`flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all ${active ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}>
             {icon}
             <span className="hidden lg:block font-medium">{label}</span>
         </div>
     )
 }
+
