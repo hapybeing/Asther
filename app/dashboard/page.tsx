@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LayoutGrid, Music, LogOut, Sparkles, Quote, RefreshCw } from "lucide-react";
+import { LayoutGrid, Music, LogOut, Sparkles, Quote } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
 import { Soundscapes } from "@/components/Soundscapes";
@@ -29,7 +29,6 @@ export default function Dashboard() {
   const [quote, setQuote] = useState(QUOTES[0]);
 
   useEffect(() => {
-    // 1. Get User
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -41,8 +40,6 @@ export default function Dashboard() {
       }
     }
     getUser();
-
-    // 2. Randomize Quote on Load
     setQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
   }, [router]);
 
@@ -52,14 +49,23 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden font-sans selection:bg-purple-500/30">
+    <div className="flex h-screen bg-black text-white overflow-hidden font-sans selection:bg-purple-500/30 relative">
       
-      {/* AMBIENCE */}
-      <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-900/20 blur-[120px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-900/10 blur-[120px] pointer-events-none z-0" />
-      
+      {/* --- NEW HIGH-PERFORMANCE BACKGROUND --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        {/* 1. Base Layer: Deep Zinc */}
+        <div className="absolute inset-0 bg-zinc-950" />
+        
+        {/* 2. The Technical Grid: A repeating pattern drawn by CSS (Zero Load) */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        
+        {/* 3. The Vignette: Fades the edges to black to focus the eyes */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_200px,#3b07641a,transparent)]" />
+      </div>
+
       {/* SIDEBAR */}
-      <aside className="w-20 lg:w-64 border-r border-white/5 bg-black/40 backdrop-blur-2xl flex flex-col items-center lg:items-start py-8 z-50">
+      <aside className="w-20 lg:w-64 border-r border-white/5 bg-black/20 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 z-50">
         <div className="mb-12 px-0 lg:px-8">
             <h2 className="text-2xl font-bold hidden lg:block tracking-tighter text-white">Asther.</h2>
             <div className="h-10 w-10 bg-white rounded-full lg:hidden flex items-center justify-center">
@@ -70,7 +76,7 @@ export default function Dashboard() {
         <nav className="flex-1 space-y-2 w-full px-3">
             <button 
                 onClick={() => setActiveTab("dashboard")} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${activeTab === 'dashboard' ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${activeTab === 'dashboard' ? 'bg-white/10 text-white border border-white/5' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent'}`}
             >
                 <LayoutGrid className="w-5 h-5 transition-transform group-hover:scale-110" />
                 <span className="hidden lg:block font-medium text-sm tracking-tight">Dashboard</span>
@@ -78,7 +84,7 @@ export default function Dashboard() {
             
             <button 
                 onClick={() => setActiveTab("soundscapes")} 
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${activeTab === 'soundscapes' ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${activeTab === 'soundscapes' ? 'bg-white/10 text-white border border-white/5' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5 border border-transparent'}`}
             >
                 <Music className="w-5 h-5 transition-transform group-hover:scale-110" />
                 <span className="hidden lg:block font-medium text-sm tracking-tight">Soundscapes</span>
@@ -101,7 +107,7 @@ export default function Dashboard() {
         
         <div className="relative p-8 lg:p-16 max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700 slide-in-from-bottom-4">
             
-            {/* VIEW 1: DASHBOARD */}
+            {/* DASHBOARD VIEW */}
             <div className={activeTab === "dashboard" ? "block space-y-10" : "hidden"}>
                 
                 <header className="space-y-2">
@@ -117,23 +123,19 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                    {/* 1. FOCUS TIMER */}
+                    {/* 1. TIMER */}
                     <FocusTimer /> 
 
-                    {/* 2. NEW: DAILY INSIGHT CARD (Fills the Void) */}
-                    <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 hover:border-white/10 transition duration-500 flex flex-col justify-between group shadow-2xl shadow-black/20 relative overflow-hidden">
-                        
-                        {/* Decorative Icon */}
+                    {/* 2. DAILY INSIGHT */}
+                    <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-8 hover:border-white/10 transition duration-500 flex flex-col justify-between group shadow-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition duration-500">
                              <Quote className="w-24 h-24 text-white" />
                         </div>
-
                         <div className="flex justify-between items-start">
                              <span className="p-3 bg-white/5 rounded-full text-zinc-400">
                                 <Sparkles className="w-5 h-5" />
                              </span>
                         </div>
-                        
                         <div className="relative z-10">
                             <p className="text-xl font-light leading-relaxed text-white/90 italic tracking-tight">
                                 "{quote.text}"
@@ -145,7 +147,7 @@ export default function Dashboard() {
                     </div>
                     
                     {/* 3. MISSION LOG */}
-                    <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 hover:border-white/10 transition duration-500 group flex flex-col shadow-2xl shadow-black/20">
+                    <div className="min-h-[16rem] rounded-[2rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-8 hover:border-white/10 transition duration-500 group flex flex-col shadow-xl">
                         <div className="flex justify-between items-center mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] animate-pulse" />
@@ -161,7 +163,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* VIEW 2: SOUNDSCAPES */}
+            {/* SOUNDSCAPES VIEW */}
             <div className={activeTab === "soundscapes" ? "block" : "hidden"}>
                 <Soundscapes />
             </div>
