@@ -1,14 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LayoutGrid, Music, Plus, LogOut } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
-import { Soundscapes } from "@/components/Soundscapes"; 
+import { Soundscapes } from "@/components/Soundscapes";
+import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+
+// Initialize client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function Dashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"dashboard" | "soundscapes">("dashboard");
-  const userName = "Gaurang"; 
+  const [userName, setUserName] = useState("Traveler"); // Default until loaded
+
+  useEffect(() => {
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // If not logged in, kick them out
+        router.push("/login");
+      } else {
+        // Use their email username (everything before the @)
+        const name = user.email?.split("@")[0] || "Traveler";
+        // Capitalize first letter
+        setUserName(name.charAt(0).toUpperCase() + name.slice(1));
+      }
+    }
+    getUser();
+  }, [router]);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
@@ -21,7 +51,6 @@ export default function Dashboard() {
         </div>
         
         <nav className="flex-1 space-y-4 w-full px-4">
-            {/* BUTTON 1: Dashboard */}
             <button 
                 onClick={() => setActiveTab("dashboard")} 
                 className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
@@ -30,7 +59,6 @@ export default function Dashboard() {
                 <span className="hidden lg:block font-medium">Dashboard</span>
             </button>
             
-            {/* BUTTON 2: Soundscapes */}
             <button 
                 onClick={() => setActiveTab("soundscapes")} 
                 className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${activeTab === 'soundscapes' ? 'bg-white/10 text-white shadow-inner' : 'text-zinc-500 hover:text-white hover:bg-white/5'}`}
@@ -40,12 +68,15 @@ export default function Dashboard() {
             </button>
         </nav>
 
-        {/* Sign Out Placeholder */}
+        {/* Real Sign Out Button */}
         <div className="px-4 w-full">
-             <div className="flex items-center gap-4 px-4 py-3 text-zinc-600 hover:text-white transition cursor-not-allowed opacity-50">
+             <button 
+                onClick={handleSignOut}
+                className="w-full flex items-center gap-4 px-4 py-3 text-zinc-600 hover:text-red-400 transition"
+             >
                 <LogOut className="w-5 h-5" />
                 <span className="hidden lg:block font-medium text-sm">Sign Out</span>
-             </div>
+             </button>
         </div>
       </aside>
 
