@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Music, Settings, LayoutGrid, CloudRain, Flame, Wind, Coffee, Volume2, Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// 1. The Sound Library (You can add more URLs later!)
+// 1. The Reliable Sound Library (Powered by Google)
 const SOUNDS = [
   {
     id: "rain",
@@ -13,7 +13,7 @@ const SOUNDS = [
     icon: CloudRain,
     color: "text-blue-400",
     bg: "bg-blue-500/10",
-    url: "https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3"
+    url: "https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg"
   },
   {
     id: "fire",
@@ -21,7 +21,7 @@ const SOUNDS = [
     icon: Flame,
     color: "text-orange-400",
     bg: "bg-orange-500/10",
-    url: "https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackles-1330.mp3"
+    url: "https://actions.google.com/sounds/v1/ambiences/fire.ogg"
   },
   {
     id: "wind",
@@ -29,7 +29,7 @@ const SOUNDS = [
     icon: Wind,
     color: "text-slate-400",
     bg: "bg-slate-500/10",
-    url: "https://assets.mixkit.co/sfx/preview/mixkit-wind-in-the-trees-1174.mp3"
+    url: "https://actions.google.com/sounds/v1/weather/wind_medium.ogg"
   },
   {
     id: "cafe",
@@ -37,38 +37,49 @@ const SOUNDS = [
     icon: Coffee,
     color: "text-amber-400",
     bg: "bg-amber-500/10",
-    url: "https://assets.mixkit.co/sfx/preview/mixkit-restaurant-crowd-talking-ambience-440.mp3"
+    url: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"
   }
 ];
 
 export default function Soundscapes() {
-  // Track which sound is playing
   const [activeSound, setActiveSound] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const toggleSound = (sound: typeof SOUNDS[0]) => {
     if (activeSound === sound.id) {
-      // Pause if clicking the same one
+      // Pause
       audioRef.current?.pause();
       setActiveSound(null);
     } else {
-      // Play new sound
-      if (audioRef.current) {
-        audioRef.current.pause(); // Stop old sound
-      }
+      // Play
+      if (audioRef.current) audioRef.current.pause();
+      
       const audio = new Audio(sound.url);
-      audio.loop = true; // Loop forever
-      audio.volume = 0.5; // 50% volume
-      audio.play();
-      audioRef.current = audio;
-      setActiveSound(sound.id);
+      audio.loop = true;
+      audio.volume = 1.0; // Max volume
+      
+      // Attempt to play with error handling for tablets
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Audio started!
+            audioRef.current = audio;
+            setActiveSound(sound.id);
+          })
+          .catch((error) => {
+            console.error("Playback failed:", error);
+            alert("Tap again! Browser blocked auto-play.");
+          });
+      }
     }
   };
 
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans">
       
-      {/* Sidebar (Same as Dashboard) */}
+      {/* Sidebar */}
       <aside className="w-20 lg:w-64 border-r border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center lg:items-start py-8 transition-all z-50">
         <div className="mb-10 px-0 lg:px-8">
             <h2 className="text-2xl font-bold hidden lg:block tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-white to-zinc-500">Asther.</h2>
@@ -80,7 +91,9 @@ export default function Soundscapes() {
                 <NavItem icon={<LayoutGrid className="w-5 h-5" />} label="Dashboard" />
             </Link>
             <NavItem icon={<CheckCircle2 className="w-5 h-5" />} label="Tasks" />
-            <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" active />
+            <Link href="/soundscapes">
+                <NavItem icon={<Music className="w-5 h-5" />} label="Soundscapes" active />
+            </Link>
             <NavItem icon={<Settings className="w-5 h-5" />} label="Settings" />
         </nav>
       </aside>
@@ -90,26 +103,23 @@ export default function Soundscapes() {
         <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-indigo-900/20 to-transparent pointer-events-none" />
 
         <div className="relative z-10 p-8 lg:p-12 max-w-7xl mx-auto space-y-10">
-            
             <header>
                 <h1 className="text-4xl font-light text-white/90">Sonic Environment.</h1>
                 <p className="text-zinc-500 mt-2">Design your background noise.</p>
             </header>
 
-            {/* The Sound Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {SOUNDS.map((sound) => (
                     <div 
                         key={sound.id}
                         onClick={() => toggleSound(sound)}
                         className={cn(
-                            "relative overflow-hidden h-64 rounded-3xl border p-8 flex flex-col justify-between cursor-pointer transition-all duration-300 group",
+                            "relative overflow-hidden h-64 rounded-3xl border p-8 flex flex-col justify-between cursor-pointer transition-all duration-300 group select-none",
                             activeSound === sound.id 
                                 ? "bg-white/10 border-white/20 scale-[1.02] shadow-2xl" 
                                 : "bg-zinc-900/50 border-white/5 hover:border-white/10 hover:bg-zinc-900/80"
                         )}
                     >
-                        {/* Glowing Background when active */}
                         {activeSound === sound.id && (
                             <div className={cn("absolute inset-0 opacity-20 blur-3xl", sound.bg)} />
                         )}
