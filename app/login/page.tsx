@@ -25,10 +25,13 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
+        // 1. Sign Up
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        alert("Check your email to confirm sign up!");
+        // 2. NO ALERT. Direct Entry.
+        router.push("/dashboard");
       } else {
+        // 3. Sign In
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         router.push("/dashboard");
@@ -100,7 +103,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* --- THE DOWNLOAD BUTTON --- */}
+        {/* Download Button */}
         <div className="mt-8 pt-8 border-t border-white/5">
             <a 
                 href="/Asther.apk" 
