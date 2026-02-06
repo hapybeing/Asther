@@ -19,13 +19,25 @@ export function FocusTimer() {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   
-  // TASK STATE
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [manualIntent, setManualIntent] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // FETCH TASKS
+  // FETCH & SUBSCRIBE
+  useEffect(() => { 
+    fetchTasks(); 
+
+    const channel = supabase
+      .channel('timer-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+        fetchTasks(); // Reload dropdown when tasks change
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); }
+  }, []);
+
   async function fetchTasks() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -34,10 +46,7 @@ export function FocusTimer() {
     }
   }
 
-  // Load on mount
-  useEffect(() => { fetchTasks(); }, []);
-
-  // Timer Ticking Logic
+  // Timer Logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isActive && timeLeft > 0) {
@@ -84,10 +93,9 @@ export function FocusTimer() {
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
-    // REMOVED 'overflow-hidden' from here so the dropdown can pop out!
     <div className="h-full min-h-[22rem] rounded-[2.5rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 lg:p-10 relative shadow-2xl flex flex-col lg:flex-row items-center gap-10 group">
       
-      {/* SEPARATE BACKGROUND LAYER (This keeps the glow inside) */}
+      {/* SEPARATE BACKGROUND LAYER */}
       <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none">
           <div className={`absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] transition-all duration-1000 ${isActive ? 'bg-purple-500/30' : ''}`} />
       </div>
@@ -155,7 +163,7 @@ export function FocusTimer() {
             </div>
         </div>
 
-        {/* --- MISSION SELECTOR (Now with Dropdown Capability) --- */}
+        {/* MISSION SELECTOR */}
         <div className="relative z-50">
             <div className="relative">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -169,10 +177,8 @@ export function FocusTimer() {
                         setManualIntent(e.target.value);
                         setSelectedTask(null);
                     }}
-                    // Force fetch on click to make sure list is fresh
                     onClick={() => { fetchTasks(); setIsDropdownOpen(true); }}
                     onFocus={() => { fetchTasks(); setIsDropdownOpen(true); }}
-                    // Small delay to allow clicking the dropdown items
                     onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)} 
                     placeholder="Select a mission or type focus..."
                     className={`w-full bg-black/50 border rounded-2xl pl-12 pr-10 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:bg-black/80 transition ${selectedTask ? 'border-purple-500/50 text-purple-100' : 'border-white/10'}`}
@@ -183,7 +189,6 @@ export function FocusTimer() {
                 </div>
             </div>
 
-            {/* THE DROPDOWN LIST */}
             {isDropdownOpen && tasks.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 z-[100] max-h-60 overflow-y-auto">
                     <div className="px-4 py-2 text-[10px] uppercase tracking-widest text-zinc-500 font-bold bg-white/5">
@@ -205,7 +210,6 @@ export function FocusTimer() {
                 </div>
             )}
             
-            {/* Empty State for Dropdown */}
             {isDropdownOpen && tasks.length === 0 && (
                  <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl p-4 text-center z-[100]">
                     <p className="text-zinc-500 text-xs">No active tasks found in Mission Control.</p>
@@ -243,4 +247,3 @@ export function FocusTimer() {
     </div>
   );
 }
-
