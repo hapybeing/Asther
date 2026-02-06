@@ -79,21 +79,34 @@ export function FocusTimer() {
     if (val && !isNaN(val)) setTimerDuration(val);
   };
 
-  async function completeSelectedTask() {
-    if (!selectedTask) return;
-    
-    // 1. STOP & RESET TIMER (The New Fix)
+  // --- THE FIXED FUNCTION ---
+  async function completeMission() {
+    // 1. Reset Timer
     setIsActive(false);
-    setTimeLeft(duration); // Reset time to full
+    setTimeLeft(duration);
 
-    // 2. Remove Task from UI
-    setTasks(tasks.filter(t => t.id !== selectedTask.id));
-    const taskToComplete = selectedTask;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // SCENARIO A: Completing an Existing Task
+    if (selectedTask) {
+        setTasks(tasks.filter(t => t.id !== selectedTask.id)); // Optimistic remove
+        await supabase.from('tasks').update({ is_completed: true }).eq('id', selectedTask.id);
+    } 
+    // SCENARIO B: Completing a New Manual Task (The Fix)
+    else if (manualIntent.trim()) {
+        const title = manualIntent;
+        // Insert it straight as completed!
+        await supabase.from('tasks').insert([{ 
+            title: title, 
+            user_id: user.id,
+            is_completed: true 
+        }]);
+    }
+
+    // Cleanup
     setSelectedTask(null);
     setManualIntent(""); 
-
-    // 3. Update Database
-    await supabase.from('tasks').update({ is_completed: true }).eq('id', taskToComplete.id);
   }
 
   const progress = ((duration - timeLeft) / duration) * 100;
@@ -104,7 +117,7 @@ export function FocusTimer() {
   return (
     <div className="h-full min-h-[22rem] rounded-[2.5rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 lg:p-10 relative shadow-2xl flex flex-col lg:flex-row items-center gap-10 group">
       
-      {/* GLOW LAYER */}
+      {/* SEPARATE BACKGROUND LAYER */}
       <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none">
           <div className={`absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] transition-all duration-1000 ${isActive ? 'bg-purple-500/30' : ''}`} />
       </div>
@@ -188,7 +201,7 @@ export function FocusTimer() {
                     onFocus={() => { fetchTasks(); setIsDropdownOpen(true); }}
                     onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)} 
                     placeholder="Select a mission or type focus..."
-                    className={`w-full bg-black/50 border rounded-2xl pl-12 pr-10 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:bg-black/80 transition ${selectedTask ? 'border-purple-500/50 text-purple-100' : 'border-white/10'}`}
+                    className={`w-full bg-black/50 border rounded-2xl pl-12 pr-10 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:bg-black/80 transition ${selectedTask || manualIntent.trim() ? 'border-purple-500/50 text-purple-100' : 'border-white/10'}`}
                 />
 
                 <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -232,9 +245,10 @@ export function FocusTimer() {
                 {isActive ? <><Pause className="w-4 h-4 fill-current" /> Pause</> : <><Play className="w-4 h-4 fill-current" /> Start</>}
             </button>
             
-            {selectedTask ? (
+            {/* THE UPGRADED CONDITION: Show if selected OR if typed! */}
+            {selectedTask || manualIntent.trim().length > 0 ? (
                 <button 
-                    onClick={completeSelectedTask}
+                    onClick={completeMission}
                     className="flex-1 py-4 rounded-2xl flex items-center justify-center gap-2 font-medium bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition animate-in fade-in slide-in-from-left-2"
                 >
                     <CheckCircle2 className="w-4 h-4" />
@@ -254,4 +268,5 @@ export function FocusTimer() {
     </div>
   );
 }
+
 
