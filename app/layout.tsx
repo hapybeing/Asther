@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -7,18 +7,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Asther | Digital Workspace",
   description: "Focus timer, task manager, and ambient soundscapes.",
-  manifest: "/manifest.json",
+  // We removed the manual 'manifest' line here because Next.js auto-detects the file!
   icons: {
-    apple: "/favicon.ico",
+    icon: "/favicon.ico",
   },
 };
 
-export const viewport: Viewport = {
-  themeColor: "#000000",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-};
+// We removed the explicit 'viewport' export to prevent version conflicts.
+// The manifest.json handles the theme color now.
 
 export default function RootLayout({
   children,
@@ -31,4 +27,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 
