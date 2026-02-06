@@ -1,0 +1,17 @@
+{
+  "name": "Asther",
+  "short_name": "Asther",
+  "description": "Your digital sanctuary for deep focus.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
