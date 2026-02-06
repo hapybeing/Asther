@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LayoutGrid, Music, LogOut, Sparkles, Quote, CheckCircle2 } from "lucide-react";
+import { LayoutGrid, Music, LogOut, Sparkles, Quote, CheckCircle2, LifeBuoy, Mail, ExternalLink } from "lucide-react";
 import { FocusTimer } from "@/components/FocusTimer";
 import { TaskList } from "@/components/TaskList";
 import { Soundscapes } from "@/components/Soundscapes";
@@ -24,7 +24,8 @@ const QUOTES = [
 
 export default function Dashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "tasks" | "soundscapes">("dashboard");
+  // NOW HAS 4 STATES
+  const [activeTab, setActiveTab] = useState<"dashboard" | "tasks" | "soundscapes" | "contact">("dashboard");
   const [userName, setUserName] = useState<string | null>(null);
   const [quote, setQuote] = useState(QUOTES[0]);
 
@@ -83,6 +84,8 @@ export default function Dashboard() {
             <SidebarBtn id="dashboard" icon={LayoutGrid} label="Dashboard" />
             <SidebarBtn id="tasks" icon={CheckCircle2} label="Tasks" />
             <SidebarBtn id="soundscapes" icon={Music} label="Soundscapes" />
+            {/* NEW SUPPORT BUTTON */}
+            <SidebarBtn id="contact" icon={LifeBuoy} label="Support" />
         </nav>
 
         <div className="px-3 w-full">
@@ -101,7 +104,7 @@ export default function Dashboard() {
         
         <div className="relative p-8 lg:p-16 max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700 slide-in-from-bottom-4">
             
-            {/* DASHBOARD VIEW */}
+            {/* VIEW 1: DASHBOARD */}
             <div className={activeTab === "dashboard" ? "block space-y-10" : "hidden"}>
                 <header className="space-y-2">
                     <div className="flex items-center gap-3 mb-2">
@@ -115,15 +118,10 @@ export default function Dashboard() {
                     </h1>
                 </header>
 
-                {/* THE NEW LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    {/* 1. SUPER TIMER (Takes 2 Columns) */}
                     <div className="lg:col-span-2">
                         <FocusTimer /> 
                     </div>
-
-                    {/* 2. DAILY INSIGHT (Takes 1 Column) */}
                     <div className="min-h-[16rem] rounded-[2.5rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-8 hover:border-white/10 transition duration-500 flex flex-col justify-between group shadow-xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition duration-500">
                              <Quote className="w-24 h-24 text-white" />
@@ -134,15 +132,10 @@ export default function Dashboard() {
                              </span>
                         </div>
                         <div className="relative z-10">
-                            <p className="text-xl font-light leading-relaxed text-white/90 italic tracking-tight">
-                                "{quote.text}"
-                            </p>
-                            <p className="mt-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">
-                                — {quote.author}
-                            </p>
+                            <p className="text-xl font-light leading-relaxed text-white/90 italic tracking-tight">"{quote.text}"</p>
+                            <p className="mt-4 text-xs font-bold text-zinc-500 uppercase tracking-widest">— {quote.author}</p>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -164,11 +157,56 @@ export default function Dashboard() {
                 <Soundscapes />
             </div>
 
+            {/* VIEW 4: CONTACT / SUPPORT (NEW) */}
+            <div className={activeTab === "contact" ? "block space-y-10" : "hidden"}>
+                <header>
+                    <h1 className="text-4xl font-light text-white/90">Support Center.</h1>
+                    <p className="text-zinc-500 mt-2">Have a question? Reach out directly.</p>
+                </header>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                    
+                    {/* EMAIL CARD */}
+                    <a href="mailto:gaurangk.inbox@gmail.com" className="group relative overflow-hidden rounded-[2.5rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-10 hover:bg-white/5 transition-all duration-300">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition duration-500">
+                             <Mail className="w-32 h-32 text-white" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="p-4 bg-blue-500/10 rounded-2xl w-fit mb-6 text-blue-400">
+                                <Mail className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-2xl font-light text-white">Email Support</h3>
+                            <p className="text-zinc-500 mt-2 text-sm">gaurangk.inbox@gmail.com</p>
+                            
+                            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-blue-400 uppercase tracking-widest group-hover:gap-4 transition-all">
+                                Send Message <ExternalLink className="w-4 h-4" />
+                            </div>
+                        </div>
+                    </a>
+
+                    {/* INSTAGRAM CARD */}
+                    <a href="https://www.instagram.com/yaytwenty26?igsh=NDNwMDVka2lsdDdl" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-[2.5rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-10 hover:bg-white/5 transition-all duration-300">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition duration-500">
+                             <Sparkles className="w-32 h-32 text-purple-400" />
+                        </div>
+                        <div className="relative z-10">
+                            <div className="p-4 bg-purple-500/10 rounded-2xl w-fit mb-6 text-purple-400">
+                                <Sparkles className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-2xl font-light text-white">Instagram</h3>
+                            <p className="text-zinc-500 mt-2 text-sm">@yaytwenty26</p>
+                            
+                            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-purple-400 uppercase tracking-widest group-hover:gap-4 transition-all">
+                                Follow / DM <ExternalLink className="w-4 h-4" />
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
         </div>
       </main>
     </div>
   );
 }
-
-
-
