@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Play, Pause, RotateCcw, Hash } from "lucide-react";
+import { Play, Pause, RotateCcw, Hash, Target, CheckCircle2 } from "lucide-react";
 
 export function FocusTimer() {
+  const [duration, setDuration] = useState(25 * 60); // Keep track of total time for progress bar
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState(""); // Store text input
+  const [customMinutes, setCustomMinutes] = useState("");
+  const [intent, setIntent] = useState(""); // What are you working on?
+  const [sessionsCompleted, setSessionsCompleted] = useState(0);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -15,8 +18,10 @@ export function FocusTimer() {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
+    } else if (timeLeft === 0 && isActive) {
       setIsActive(false);
+      setSessionsCompleted(prev => prev + 1);
+      // Optional: Play a "ding" sound here later
     }
 
     return () => clearInterval(interval);
@@ -30,73 +35,126 @@ export function FocusTimer() {
 
   const toggleTimer = () => setIsActive(!isActive);
 
-  const setDuration = (minutes: number) => {
-    setTimeLeft(minutes * 60);
+  const setTimerDuration = (minutes: number) => {
+    const seconds = minutes * 60;
+    setDuration(seconds);
+    setTimeLeft(seconds);
     setIsActive(false);
-    setCustomMinutes(""); // Clear custom input when using preset
+    setCustomMinutes(""); 
   };
 
   const handleCustomInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setCustomMinutes(val);
     if (val && !isNaN(Number(val))) {
-        setTimeLeft(Number(val) * 60);
-        setIsActive(false);
+        setTimerDuration(Number(val));
     }
   };
 
+  // Calculate Progress Percentage for the Ring
+  const progress = ((duration - timeLeft) / duration) * 100;
+  const radius = 120; // Radius of the circle
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
   return (
-    <div className="h-72 rounded-[2.5rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 flex flex-col justify-between relative overflow-hidden group shadow-2xl">
+    <div className="h-full min-h-[22rem] rounded-[2.5rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 lg:p-10 relative overflow-hidden shadow-2xl flex flex-col lg:flex-row items-center gap-10 group">
       
       {/* Background Glow */}
-      <div className={`absolute top-0 right-0 w-40 h-40 bg-purple-500/20 blur-[80px] transition-all duration-1000 ${isActive ? 'bg-purple-500/40' : ''}`} />
+      <div className={`absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] transition-all duration-1000 ${isActive ? 'bg-purple-500/30' : ''}`} />
 
-      {/* Controls Row */}
-      <div className="flex justify-between items-center z-10">
-        <div className="flex gap-2">
-            {/* Presets */}
-            <button onClick={() => setDuration(25)} className="text-xs px-3 py-1.5 rounded-full border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 transition">25m</button>
-            <button onClick={() => setDuration(45)} className="text-xs px-3 py-1.5 rounded-full border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 transition">45m</button>
-            
-            {/* THE NEW CUSTOM INPUT */}
-            <div className="relative group/input">
-                <Hash className="w-3 h-3 text-zinc-500 absolute left-2.5 top-2" />
-                <input 
-                    type="number" 
-                    placeholder="Custom"
-                    value={customMinutes}
-                    onChange={handleCustomInput}
-                    className="w-20 text-xs pl-7 py-1.5 rounded-full border border-white/10 bg-transparent text-white focus:outline-none focus:border-purple-500/50 focus:bg-white/5 transition placeholder:text-zinc-600"
+      {/* LEFT SIDE: THE CLOCK */}
+      <div className="relative flex-shrink-0">
+        {/* SVG Progress Ring */}
+        <div className="relative w-64 h-64 flex items-center justify-center">
+             {/* Background Circle */}
+             <svg className="absolute w-full h-full rotate-[-90deg]">
+                <circle cx="128" cy="128" r={radius} stroke="currentColor" strokeWidth="4" fill="transparent" className="text-zinc-800" />
+             </svg>
+             {/* Active Progress Circle */}
+             <svg className="absolute w-full h-full rotate-[-90deg]">
+                <circle 
+                    cx="128" cy="128" r={radius} 
+                    stroke="currentColor" strokeWidth="4" fill="transparent" 
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    className={`text-white transition-all duration-1000 ease-linear ${isActive ? 'opacity-100' : 'opacity-30'}`}
                 />
+             </svg>
+             
+             {/* Digital Time */}
+             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                <div className={`text-6xl font-thin tracking-tighter tabular-nums transition-colors ${isActive ? 'text-white' : 'text-zinc-500'}`}>
+                    {formatTime(timeLeft)}
+                </div>
+                <div className="mt-2 flex gap-2">
+                    <button onClick={() => setTimerDuration(25)} className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-zinc-500 hover:text-white transition">25</button>
+                    <button onClick={() => setTimerDuration(45)} className="text-[10px] px-2 py-1 rounded-full border border-white/10 text-zinc-500 hover:text-white transition">45</button>
+                    <div className="relative group/input">
+                         <Hash className="w-3 h-3 text-zinc-600 absolute left-1.5 top-1.5" />
+                         <input 
+                            type="number" 
+                            placeholder="" 
+                            value={customMinutes}
+                            onChange={handleCustomInput}
+                            className="w-10 text-[10px] pl-5 py-1 rounded-full border border-white/10 bg-transparent text-white focus:outline-none focus:border-purple-500/50"
+                        />
+                    </div>
+                </div>
+             </div>
+        </div>
+      </div>
+
+      {/* RIGHT SIDE: THE COCKPIT */}
+      <div className="flex-1 w-full flex flex-col justify-center gap-6 z-10">
+        
+        {/* Header Section */}
+        <div className="space-y-1">
+            <h2 className="text-2xl font-light text-white tracking-tight">Focus Session</h2>
+            <div className="flex items-center gap-2 text-zinc-500 text-xs uppercase tracking-widest font-bold">
+                <CheckCircle2 className="w-3 h-3 text-green-500" />
+                <span>{sessionsCompleted} Sessions Completed Today</span>
             </div>
         </div>
-        
-        <button onClick={() => setDuration(25)} className="text-zinc-600 hover:text-white transition p-2">
-            <RotateCcw className="w-4 h-4" />
-        </button>
-      </div>
 
-      {/* The Digits */}
-      <div className="text-center z-10 mt-2">
-        <div className={`text-8xl font-thin tracking-tighter transition-colors duration-500 tabular-nums ${isActive ? 'text-white' : 'text-zinc-500'}`}>
-            {formatTime(timeLeft)}
+        {/* Intent Input (The "Groundbreaking" Feature) */}
+        <div className="relative">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Target className={`w-4 h-4 ${isActive ? 'text-purple-400' : 'text-zinc-600'}`} />
+            </div>
+            <input 
+                type="text" 
+                value={intent}
+                onChange={(e) => setIntent(e.target.value)}
+                placeholder="What is your main focus?"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 focus:bg-white/10 transition"
+            />
         </div>
-        <p className="text-zinc-500 text-xs font-bold tracking-[0.2em] uppercase mt-2 animate-pulse">
-            {isActive ? "Flow State Active" : "Ready to Focus?"}
-        </p>
-      </div>
 
-      {/* Action Button */}
-      <button 
-        onClick={toggleTimer}
-        className={`w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-medium transition-all duration-300 z-10 ${isActive ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' : 'bg-white text-black hover:bg-zinc-200 shadow-[0_0_20px_rgba(255,255,255,0.1)]'}`}
-      >
-        {isActive ? (
-            <><Pause className="w-4 h-4 fill-current" /> Pause Session</>
-        ) : (
-            <><Play className="w-4 h-4 fill-current" /> Start Focus</>
-        )}
-      </button>
+        {/* Main Controls */}
+        <div className="flex gap-4">
+            <button 
+                onClick={toggleTimer}
+                className={`flex-1 py-4 rounded-2xl flex items-center justify-center gap-2 font-medium transition-all duration-300 ${isActive ? 'bg-white text-black hover:scale-[1.02]' : 'bg-white text-black hover:bg-zinc-200'}`}
+            >
+                {isActive ? (
+                    <><Pause className="w-4 h-4 fill-current" /> Pause</>
+                ) : (
+                    <><Play className="w-4 h-4 fill-current" /> Start</>
+                )}
+            </button>
+            
+            <button 
+                onClick={() => setTimerDuration(duration / 60)} // Reset
+                className="p-4 rounded-2xl border border-white/10 text-zinc-400 hover:text-white hover:bg-white/5 transition"
+            >
+                <RotateCcw className="w-5 h-5" />
+            </button>
+        </div>
+
+      </div>
     </div>
   );
 }
+
