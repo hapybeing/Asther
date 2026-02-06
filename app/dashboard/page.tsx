@@ -24,12 +24,16 @@ const QUOTES = [
 
 export default function Dashboard() {
   const router = useRouter();
-  // NOW HAS 4 STATES
   const [activeTab, setActiveTab] = useState<"dashboard" | "tasks" | "soundscapes" | "contact">("dashboard");
   const [userName, setUserName] = useState<string | null>(null);
   const [quote, setQuote] = useState(QUOTES[0]);
+  
+  // TIME STATE
+  const [greeting, setGreeting] = useState("Good Day");
+  const [currentDate, setCurrentDate] = useState("");
 
   useEffect(() => {
+    // 1. Get User
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -41,7 +45,20 @@ export default function Dashboard() {
       }
     }
     getUser();
+
+    // 2. Set Random Quote
     setQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+
+    // 3. Calculate Time & Date
+    const now = new Date();
+    const hour = now.getHours();
+    
+    if (hour < 12) setGreeting("Good Morning");
+    else if (hour < 18) setGreeting("Good Afternoon");
+    else setGreeting("Good Evening");
+
+    setCurrentDate(now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
+
   }, [router]);
 
   async function handleSignOut() {
@@ -49,7 +66,6 @@ export default function Dashboard() {
     router.push("/login");
   }
 
-  // Sidebar Button Component
   const SidebarBtn = ({ id, icon: Icon, label }: { id: typeof activeTab, icon: any, label: string }) => (
     <button 
         onClick={() => setActiveTab(id)} 
@@ -63,7 +79,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen bg-black text-white overflow-hidden font-sans selection:bg-purple-500/30 relative">
       
-      {/* GRID BACKGROUND */}
+      {/* BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-zinc-950" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -84,7 +100,6 @@ export default function Dashboard() {
             <SidebarBtn id="dashboard" icon={LayoutGrid} label="Dashboard" />
             <SidebarBtn id="tasks" icon={CheckCircle2} label="Tasks" />
             <SidebarBtn id="soundscapes" icon={Music} label="Soundscapes" />
-            {/* NEW SUPPORT BUTTON */}
             <SidebarBtn id="contact" icon={LifeBuoy} label="Support" />
         </nav>
 
@@ -108,12 +123,14 @@ export default function Dashboard() {
             <div className={activeTab === "dashboard" ? "block space-y-10" : "hidden"}>
                 <header className="space-y-2">
                     <div className="flex items-center gap-3 mb-2">
+                        {/* DYNAMIC DATE */}
                         <span className="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest text-zinc-400 font-medium">
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+                            {currentDate || "Loading..."}
                         </span>
                     </div>
+                    {/* DYNAMIC GREETING */}
                     <h1 className="text-5xl lg:text-6xl font-thin tracking-tighter text-white/90">
-                        Good Evening, {" "}
+                        {greeting}, {" "}
                         {userName ? <span className="font-normal text-white animate-in fade-in duration-500">{userName}</span> : <span className="inline-block w-64 h-12 bg-white/10 rounded-xl animate-pulse align-bottom ml-2" />}.
                     </h1>
                 </header>
@@ -157,7 +174,7 @@ export default function Dashboard() {
                 <Soundscapes />
             </div>
 
-            {/* VIEW 4: CONTACT / SUPPORT (NEW) */}
+            {/* VIEW 4: CONTACT */}
             <div className={activeTab === "contact" ? "block space-y-10" : "hidden"}>
                 <header>
                     <h1 className="text-4xl font-light text-white/90">Support Center.</h1>
@@ -165,8 +182,6 @@ export default function Dashboard() {
                 </header>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-                    
-                    {/* EMAIL CARD */}
                     <a href="mailto:gaurangk.inbox@gmail.com" className="group relative overflow-hidden rounded-[2.5rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-10 hover:bg-white/5 transition-all duration-300">
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition duration-500">
                              <Mail className="w-32 h-32 text-white" />
@@ -177,14 +192,12 @@ export default function Dashboard() {
                             </div>
                             <h3 className="text-2xl font-light text-white">Email Support</h3>
                             <p className="text-zinc-500 mt-2 text-sm">gaurangk.inbox@gmail.com</p>
-                            
                             <div className="mt-8 flex items-center gap-2 text-sm font-bold text-blue-400 uppercase tracking-widest group-hover:gap-4 transition-all">
                                 Send Message <ExternalLink className="w-4 h-4" />
                             </div>
                         </div>
                     </a>
 
-                    {/* INSTAGRAM CARD */}
                     <a href="https://www.instagram.com/yaytwenty26?igsh=NDNwMDVka2lsdDdl" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-[2.5rem] bg-zinc-900/30 backdrop-blur-md border border-white/5 p-10 hover:bg-white/5 transition-all duration-300">
                         <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition duration-500">
                              <Sparkles className="w-32 h-32 text-purple-400" />
@@ -195,13 +208,11 @@ export default function Dashboard() {
                             </div>
                             <h3 className="text-2xl font-light text-white">Instagram</h3>
                             <p className="text-zinc-500 mt-2 text-sm">@yaytwenty26</p>
-                            
                             <div className="mt-8 flex items-center gap-2 text-sm font-bold text-purple-400 uppercase tracking-widest group-hover:gap-4 transition-all">
                                 Follow / DM <ExternalLink className="w-4 h-4" />
                             </div>
                         </div>
                     </a>
-
                 </div>
             </div>
 
