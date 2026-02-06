@@ -31,7 +31,7 @@ export function FocusTimer() {
     const channel = supabase
       .channel('timer-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
-        fetchTasks(); // Reload dropdown when tasks change
+        fetchTasks(); 
       })
       .subscribe();
 
@@ -81,10 +81,19 @@ export function FocusTimer() {
 
   async function completeSelectedTask() {
     if (!selectedTask) return;
+    
+    // 1. STOP & RESET TIMER (The New Fix)
+    setIsActive(false);
+    setTimeLeft(duration); // Reset time to full
+
+    // 2. Remove Task from UI
     setTasks(tasks.filter(t => t.id !== selectedTask.id));
+    const taskToComplete = selectedTask;
     setSelectedTask(null);
     setManualIntent(""); 
-    await supabase.from('tasks').update({ is_completed: true }).eq('id', selectedTask.id);
+
+    // 3. Update Database
+    await supabase.from('tasks').update({ is_completed: true }).eq('id', taskToComplete.id);
   }
 
   const progress = ((duration - timeLeft) / duration) * 100;
@@ -95,12 +104,12 @@ export function FocusTimer() {
   return (
     <div className="h-full min-h-[22rem] rounded-[2.5rem] bg-zinc-900/40 backdrop-blur-xl border border-white/5 p-8 lg:p-10 relative shadow-2xl flex flex-col lg:flex-row items-center gap-10 group">
       
-      {/* SEPARATE BACKGROUND LAYER */}
+      {/* GLOW LAYER */}
       <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden pointer-events-none">
           <div className={`absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] transition-all duration-1000 ${isActive ? 'bg-purple-500/30' : ''}`} />
       </div>
 
-      {/* LEFT SIDE: THE CLOCK */}
+      {/* CLOCK */}
       <div className="relative flex-shrink-0 z-10">
         <div className="relative w-64 h-64 flex items-center justify-center">
              <svg className="absolute w-full h-full rotate-[-90deg]">
@@ -152,9 +161,8 @@ export function FocusTimer() {
         </div>
       </div>
 
-      {/* RIGHT SIDE: THE COCKPIT */}
+      {/* CONTROLS */}
       <div className="flex-1 w-full flex flex-col justify-center gap-6 z-10">
-        
         <div className="space-y-1">
             <h2 className="text-2xl font-light text-white tracking-tight">Focus Session</h2>
             <div className="flex items-center gap-2 text-zinc-500 text-xs uppercase tracking-widest font-bold">
@@ -163,7 +171,6 @@ export function FocusTimer() {
             </div>
         </div>
 
-        {/* MISSION SELECTOR */}
         <div className="relative z-50">
             <div className="relative">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -247,3 +254,4 @@ export function FocusTimer() {
     </div>
   );
 }
+
