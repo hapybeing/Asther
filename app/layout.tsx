@@ -7,14 +7,12 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Asther | Digital Workspace",
   description: "Focus timer, task manager, and ambient soundscapes.",
-  // We removed the manual 'manifest' line here because Next.js auto-detects the file!
+  // This points to the file you just created in the public folder
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
   },
 };
-
-// We removed the explicit 'viewport' export to prevent version conflicts.
-// The manifest.json handles the theme color now.
 
 export default function RootLayout({
   children,
@@ -27,5 +25,4 @@ export default function RootLayout({
     </html>
   );
 }
-
 
