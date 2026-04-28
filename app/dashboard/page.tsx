@@ -207,7 +207,7 @@ export default function Dashboard() {
                                 <Sparkles className="w-8 h-8" />
                             </div>
                             <h3 className="text-2xl font-light text-white">Instagram</h3>
-                            <p className="text-zinc-500 mt-2 text-sm">@yaytwenty26</p>
+                            <p className="text-zinc-500 mt-2 text-sm">@gaurangxoxo</p>
                             <div className="mt-8 flex items-center gap-2 text-sm font-bold text-purple-400 uppercase tracking-widest group-hover:gap-4 transition-all">
                                 Follow / DM <ExternalLink className="w-4 h-4" />
                             </div>
